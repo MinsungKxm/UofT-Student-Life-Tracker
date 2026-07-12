@@ -1,0 +1,97 @@
+/* ===== Shared Guide Page Styles ===== */
+/* Used by ASIP.jsx, CampusJobs.jsx, ROP.jsx, WorkStudy.jsx */
+
+.guide-page {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  color: #1a1a1a;
+  background-color: #ffffff;
+  line-height: 1.6;
+}
+
+/* ---- Content container ---- */
+
+.guide-page .guide-content {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 40px 20px 100px;
+}
+
+/* ---- Centered top block: title, github link, meta, image ---- */
+
+.guide-page .guide-title {
+  text-align: center;
+  font-size: 1.9rem;
+  font-weight: 500;
+  margin-bottom: 12px;
+}
+
+.guide-page .guide-github-link {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.guide-page .guide-github-link a {
+  color: #6a5acd;
+  text-decoration: none;
+}
+
+.guide-page .guide-github-link a:hover {
+  text-decoration: underline;
+}
+
+.guide-page .guide-meta {
+  text-align: center;
+  font-size: 1rem;
+  color: #1a1a1a;
+  margin-bottom: 16px;
+}
+
+.guide-page .guide-image-wrap {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.guide-page .guide-image-wrap img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* ---- Author block (left aligned) ---- */
+
+.guide-page .guide-author {
+  margin-bottom: 20px;
+}
+
+.guide-page .guide-author p {
+  margin: 0 0 2px;
+}
+
+/* ---- Author's note ---- */
+
+.guide-page .guide-note p {
+  margin: 0 0 16px;
+}
+
+.guide-page .guide-note strong {
+  font-weight: 700;
+}
+
+/* ---- Section heading below note (e.g. Audio Version, Overview) ---- */
+
+.guide-page .guide-section-heading {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-top: 40px;
+}
+
+/* ---- Responsive ---- */
+
+@media (max-width: 600px) {
+  .guide-page .guide-content {
+    padding: 30px 16px 80px;
+  }
+
+  .guide-page .guide-title {
+    font-size: 1.5rem;
+  }
+}

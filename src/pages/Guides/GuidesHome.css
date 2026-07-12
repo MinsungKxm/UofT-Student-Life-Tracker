@@ -1,0 +1,117 @@
+/* ===== GuidesHome Component Styles ===== */
+/* Scoped under .guides-page so it won't collide with other components */
+
+.guides-page {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  color: #1a1a1a;
+  background-color: #ffffff;
+  line-height: 1.6;
+}
+
+/* ---- Header ---- */
+
+.guides-page .site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 40px;
+}
+/* Copy of the Load Poneglyph.  */
+.guides-page .logo {
+  font-weight: 700;
+  font-size: 1.4rem;
+  letter-spacing: 0.5px;
+}
+
+.guides-page .main-nav a {
+  margin-left: 28px;
+  text-decoration: none;
+  color: #6b6b6b;
+  font-size: 1rem;
+}
+
+.guides-page .main-nav a:hover {
+  color: #1a1a1a;
+}
+
+/* ---- Page Title ---- */
+
+.guides-page .guides-home {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 60px 40px 100px;
+}
+
+.guides-page .page-title {
+  font-size: 2.75rem;
+  font-weight: 800;
+  margin-bottom: 4px;
+  padding-bottom: 12px;
+  border-bottom: 4px solid #1a1a1a;
+  display: inline-block;
+}
+
+/* ---- Sections ---- */
+
+.guides-page .guide-section {
+  margin-top: 48px;
+}
+
+.guides-page .guide-section h2 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.guides-page .link-list {
+  list-style: disc;
+  padding-left: 22px;
+  margin: 0;
+}
+
+.guides-page .link-list li {
+  margin-bottom: 10px;
+}
+
+.guides-page .link-list a {
+  color: #6a5acd;
+  text-decoration: none;
+}
+
+.guides-page .link-list a:hover {
+  text-decoration: underline;
+}
+
+.guides-page .link-description {
+  margin: 4px 0 0;
+  color: #444;
+  font-size: 0.95rem;
+}
+
+.guides-page .note {
+  color: #6b6b6b;
+  font-size: 0.9rem;
+}
+
+/* ---- Responsive ---- */
+
+@media (max-width: 600px) {
+  .guides-page .site-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .guides-page .main-nav a {
+    margin-left: 0;
+    margin-right: 20px;
+  }
+
+  .guides-page .guides-home {
+    padding: 40px 20px 80px;
+  }
+
+  .guides-page .page-title {
+    font-size: 2.1rem;
+  }
+}
