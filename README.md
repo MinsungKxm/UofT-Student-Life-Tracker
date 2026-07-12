@@ -1,16 +1,38 @@
-# React + Vite
+# UofT Student Life Tracker
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A student-focused productivity and resource management web application designed to help University of Toronto students organize their academic life, discover campus resources, and stay on top of important deadlines.
 
-Currently, two official plugins are available:
+## Overview
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+University students often have to navigate many disconnected platforms for courses, deadlines, campus services, and opportunities. The UofT Student Life Tracker brings these resources together into one centralized dashboard.
 
-## React Compiler
+The application provides tools and guides to help students manage:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Academic deadlines and important dates
+- Campus resources and student services
+- Internship and career opportunities
+- Research opportunities
+- On-campus jobs
+- Student life information
 
-## Expanding the ESLint configuration
+## Features
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Dashboard
+- View important upcoming events and deadlines
+- Access frequently used student resources
+- Organize academic and personal tasks
+
+### Student Guides
+Provides centralized guides for navigating UofT systems and opportunities, including:
+
+- ACORN
+- Quercus
+- CLNx
+- Folio
+- Crowdmark
+- MarkUs
+- ASIP (Arts & Science Internship Program)
+- On-campus employment
+- Research opportunities
+
+git clone https://github.com/MinsungKxm/UofT-Student-Life-Tracker.git
