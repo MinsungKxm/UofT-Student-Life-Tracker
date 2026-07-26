@@ -1,16 +1,18 @@
 import express from "express";
-import { dirname } from "path";
+import path from "path";
 import { fileURLToPath } from "url";
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
-const port = 3000;
 
-app.get("/", (req, res)=>{
-  res.sendFile(__dirname + "/index.html");
+app.use(express.static(path.join(__dirname, "dist")));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "dist", "index.html"));
 });
 
-app.listen(port, ()=>{
-  console.log("Server running on port 3000");
+app.listen(3000, () => {
+  console.log("Server running");
 });

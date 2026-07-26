@@ -1,16 +1,18 @@
-import React from "react";
+import { NavLink } from "react-router-dom";
 
-function SideLink({ text, activeLink, setActiveLink }) {
-  const id = text.toLowerCase().replace(/\s/g, "");
+function SideLink({ text, to }) {
 
   return (
-    <a
-      href={`#${id}`}
-      className={`side-link ${activeLink === id ? "active" : ""}`}
-      onClick={() => setActiveLink(id)}
+    <NavLink
+      to={to}
+      className={({ isActive }) =>
+        isActive 
+          ? "side-link active"
+          : "side-link"
+      }
     >
       {text}
-    </a>
+    </NavLink>
   );
 }
 

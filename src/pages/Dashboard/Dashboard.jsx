@@ -2,7 +2,9 @@ import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import SideLink from "../../components/SideLink";
 import SideSection from "../../components/SideSection";
+import SideBar from "../../components/SideBar";
 import Card from "../../components/Card";
+import Header from "../.././components/Header.jsx";
 
 // ---- Resource links (sidebar + quick links) ----------------------------------
 const RESOURCES = [
@@ -221,66 +223,9 @@ function Dashboard() {
   return (
     <div className="app">
       {/* Top bar */}
-      <header className="topbar">
-        <div className="topbar-left">
-          <span className="crest" aria-hidden="true">🎓</span>
-          <span className="brand">U OF T</span>
-          <span className="brand-divider" />
-          <span className="brand-sub">STUDENT LIFE TRACKER</span>
-        </div>
-        <div className="topbar-right">
-          <button className="help-btn" type="button">Need Help?</button>
-          <button className="icon-btn" type="button" aria-label="Notifications">🔔</button>
-          <div className="user-chip">
-            Minsung Kim <span className="chip-caret">▾</span>
-          </div>
-        </div>
-      </header>
 
       <div className="layout">
         {/* Sidebar */}
-        <nav className="sidebar">
-          <SideLink
-            text="Dashboard"
-            activeLink={activeLink}
-            setActiveLink={setActiveLink}
-          />
-
-          <SideSection title="RESOURCES" titleClass="resources-title">
-            {RESOURCES.map((r) => (
-              <a
-                key={r.name}
-                className="side-link"
-                href={r.url}
-                target="_blank"
-                rel="noreferrer"
-              >
-                {r.name}
-              </a>
-            ))}
-          </SideSection>
-
-          <SideSection title="PLANNING" titleClass="planning-title">
-            <SideLink
-                text="Calendar"
-                activeLink={activeLink}
-                setActiveLink={setActiveLink}
-              />
-
-              <SideLink
-                text="Deadlines"
-                activeLink={activeLink}
-                setActiveLink={setActiveLink}
-              />
-          </SideSection>
-          <SideSection title="WELLNESS" titleClass="wellness-title">
-            <SideLink
-              text="Fitness Tracker"
-              activeLink={activeLink}
-              setActiveLink={setActiveLink}
-            />
-          </SideSection>
-        </nav>
 
         {/* Main content */}
         <main className="main-content" id="dashboard">
@@ -324,17 +269,23 @@ function Dashboard() {
             </section>
 
             {/* Task checklist */}
-            <Card title="Task Checklist">
-              <p className="checklist-progress">
-                You've completed <strong>{completedCount}</strong> of {checklist.length} tasks.
-              </p>
+            <Card
+              icon="✓"
+              title="Task Checklist"
+              subtitle={`${completedCount} of ${checklist.length} completed`}
+              badge={`${Math.round((completedCount / checklist.length) * 100)}%`}
+              footer="Click any task to mark it as complete"
+            >
+              <div className="progress-track">
+                <div
+                  className="progress-fill"
+                  style={{ width: `${(completedCount / checklist.length) * 100}%` }}
+                />
+              </div>
 
               <ul className="checklist">
                 {checklist.map((item) => (
-                  <li
-                    key={item.id}
-                    className={`checklist-item${item.done ? " done" : ""}`}
-                  >
+                  <li key={item.id} className={`checklist-item${item.done ? " done" : ""}`}>
                     <button
                       type="button"
                       className="checklist-toggle"
@@ -345,10 +296,12 @@ function Dashboard() {
                       {item.done ? "✓" : ""}
                     </button>
                     <span>{item.text}</span>
+                    {item.done && <span className="done-label">Done</span>}
                   </li>
                 ))}
               </ul>
             </Card>
+
             {/* Quick links */}
             <Card title="Quick Links">
               <div className="quicklinks-grid">
@@ -377,14 +330,12 @@ function Dashboard() {
             </Card>
             {/* Deadlines */}
             <Card
+              icon="📅"
               title="Upcoming Deadlines"
+              subtitle={`${deadlines.length} tracked`}
               id="deadlines"
               footer={
-                <a
-                  className="btn btn-primary"
-                  href="#calendar"
-                  onClick={() => setActiveLink("calendar")}
-                >
+                <a className="btn btn-primary" href="#calendar" onClick={() => setActiveLink("calendar")}>
                   Add to Calendar
                 </a>
               }
@@ -392,25 +343,17 @@ function Dashboard() {
               <ul className="deadline-list">
                 {deadlines.map((d) => {
                   const status = getDeadlineStatus(d.due, today);
-
                   return (
                     <li key={d.id} className="deadline-row">
                       <div className="deadline-info">
                         <span className="deadline-course">{d.course}</span>
                         <span className="deadline-title">{d.title}</span>
                       </div>
-
                       <div className="deadline-meta">
                         <span className="deadline-date">
-                          {d.due.toLocaleDateString("en-CA", {
-                            month: "short",
-                            day: "numeric",
-                          })}
+                          {d.due.toLocaleDateString("en-CA", { month: "short", day: "numeric" })}
                         </span>
-
-                        <span className={`status-tag status-tag-${status.tone}`}>
-                          {status.label}
-                        </span>
+                        <span className={`status-tag status-tag-${status.tone}`}>{status.label}</span>
                       </div>
                     </li>
                   );
