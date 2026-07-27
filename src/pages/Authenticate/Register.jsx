@@ -1,5 +1,19 @@
 import React from "react";
 
+/*
+Ability: Twin Impact
+ - Any 'surface' (even air) they strike, they can create a second impact either instantenously or after some time. The force of the impact can be ranged from the original one to its SQUARED version.
+
+ - This makes the user seemingly a physical monster, able to dish out huge powerful punches and kicks, traverse fast throughout the battlefield by kicking off the air and moving fast. They're like dashing on air. 
+
+ - They even uses the impact they strike on air when they're pulling back for a punch (like their elbow) to create a second impact, to make a punch move FASTER.
+
+This movement, attack patterns, etc required heavy training (notably reaction time for flight) while also training martial arts, notably 
+kyokushin karate and boxing. Though we see the user wearing a 'scouter', this is so the user knows where they created an impact. 
+
+
+*/
+
 function Register() {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-6">
@@ -19,7 +33,10 @@ function Register() {
           </p>
         </div>
 
-        {/* Register Form */}
+        {/* Register Form
+        
+        
+        */}
         <form
           className="space-y-5"
           action="http://localhost:3000/register"
