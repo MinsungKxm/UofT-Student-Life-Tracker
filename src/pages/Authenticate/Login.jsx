@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 
 function Login() {
@@ -16,7 +17,7 @@ function Login() {
       </div>
 
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-        <form className="space-y-6" action="/login" method="POST">
+        <form className="space-y-6" action="http://localhost:3000/login" method="POST">
           <label htmlFor="email" className="block text-sm font-medium text-gray-100">
             Email address
           </label>
@@ -45,6 +46,12 @@ function Login() {
           >
             Sign in
           </button>
+          <p>
+            Don't have an account?{" "}
+            <Link to="/register">
+              Create an account
+            </Link>
+          </p>
         </form>
       </div>
     </div>
