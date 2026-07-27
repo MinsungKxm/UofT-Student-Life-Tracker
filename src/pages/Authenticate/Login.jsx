@@ -1,58 +1,155 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
-
+import { Eye, EyeOff, GraduationCap, ArrowRight } from "lucide-react";
 
 function Login() {
+  const [showPassword, setShowPassword] = useState(false);
+
   return (
-    <div className="min-h-screen flex flex-col justify-center px-6 py-12 lg:px-8 bg-black">
-      <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-        <img
-          src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500"
-          alt="Your Company"
-          className="mx-auto h-10 w-auto"
-        />
-        <h2 className="mt-10 text-center text-2xl font-bold tracking-tight text-white">
-          Sign in to your account
-        </h2>
-      </div>
+    <div
+      className="min-h-screen bg-background flex items-center justify-center p-6"
+      style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}
+    >
+      <div className="w-full max-w-md">
 
-      <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-        <form className="space-y-6" action="http://localhost:3000/login" method="POST">
-          <label htmlFor="email" className="block text-sm font-medium text-gray-100">
-            Email address
-          </label>
-          <input
-            id="email"
-            type="text"
-            name="email"
-            required
-            className="mt-2 block w-full rounded-md bg-white/5 px-3 py-1.5 text-white"
-          />
+        {/* Logo / Brand */}
+        <div className="flex flex-col items-center mb-8">
+          <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center shadow-lg mb-4">
+            <GraduationCap className="w-6 h-6 text-primary-foreground" />
+          </div>
 
-          <label htmlFor="password" className="block text-sm font-medium text-gray-100">
-            Password
-          </label>
-          <input
-            id="password"
-            type="text"
-            name="password"
-            required
-            className="mt-2 block w-full rounded-md bg-white/5 px-3 py-1.5 text-white"
-          />
+          <h1 className="text-2xl font-semibold text-foreground tracking-tight">
+            Welcome back
+          </h1>
 
-          <button
-            type="submit"
-            className="w-full rounded-md bg-indigo-500 py-2 text-white hover:bg-indigo-400"
-          >
-            Sign in
-          </button>
-          <p>
-            Don't have an account?{" "}
-            <Link to="/register">
-              Create an account
-            </Link>
+          <p className="text-sm text-muted-foreground mt-1">
+            Sign in to your student portal
           </p>
-        </form>
+        </div>
+
+
+        {/* Card */}
+        <div className="bg-card rounded-2xl shadow-sm border border-border overflow-hidden">
+
+          <div className="px-8 py-8">
+
+            <form
+              action="http://localhost:3000/login"
+              method="POST"
+              className="space-y-5"
+            >
+
+              {/* Email */}
+              <div>
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium text-card-foreground mb-1.5"
+                >
+                  Email address
+                </label>
+
+                <input
+                  id="email"
+                  type="email"
+                  name="email"
+                  required
+                  placeholder="you@mail.utoronto.ca"
+                  className="block w-full rounded-xl bg-muted border border-border px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all"
+                />
+              </div>
+
+
+              {/* Password */}
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+
+                  <label
+                    htmlFor="password"
+                    className="block text-sm font-medium text-card-foreground"
+                  >
+                    Password
+                  </label>
+
+                  <a
+                    href="#"
+                    className="text-xs text-primary font-medium hover:underline"
+                  >
+                    Forgot password?
+                  </a>
+
+                </div>
+
+
+                <div className="relative">
+
+                  <input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    name="password"
+                    required
+                    placeholder="••••••••"
+                    className="block w-full rounded-xl bg-muted border border-border px-4 py-2.5 pr-11 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all"
+                  />
+
+
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((v) => !v)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="w-4 h-4" />
+                    ) : (
+                      <Eye className="w-4 h-4" />
+                    )}
+                  </button>
+
+                </div>
+              </div>
+
+
+              {/* Divider */}
+              <div className="h-px bg-border" />
+
+
+              {/* Submit */}
+              <button
+                type="submit"
+                className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground text-sm font-medium py-2.5 px-4 rounded-xl hover:bg-primary/90 active:scale-[0.98] transition-all shadow-sm"
+              >
+                Sign in
+                <ArrowRight className="w-4 h-4" />
+              </button>
+
+            </form>
+
+          </div>
+
+
+          {/* Footer */}
+          <div className="px-8 py-4 bg-muted/40 border-t border-border flex items-center justify-center gap-1.5">
+
+            <span className="text-sm text-muted-foreground">
+              Don't have an account?
+            </span>
+
+            <Link
+              to="/register"
+              className="text-sm font-semibold text-primary hover:underline"
+            >
+              Create one
+            </Link>
+
+          </div>
+
+        </div>
+
+
+        {/* Bottom caption */}
+        <p className="text-center text-xs text-muted-foreground mt-6">
+          University of Toronto &mdash; Student Information System
+        </p>
+
       </div>
     </div>
   );
