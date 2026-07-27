@@ -17,7 +17,7 @@ function App() {
 
         {/* Pages without sidebar/header */}
         <Route 
-          path="/login" 
+          path="/" 
           element={<Login />}
         />
 
@@ -26,7 +26,7 @@ function App() {
         <Route element={<Layout />}>
 
           <Route 
-            path="/" 
+            path="/dashboard" 
             element={<Dashboard />}
           />
 
