@@ -6,7 +6,7 @@ const RESOURCES = [
   { name: "ACORN", url: "https://acorn.utoronto.ca/" },
   { name: "Quercus", url: "https://q.utoronto.ca/" },
   { name: "Crowdmark", url: "https://crowdmark.com/" },
-  { name: "MarkUs", url: "https://markus.teach.cs.toronto.edu/" },
+  { name: "MarkUs", url: "https://markus-ds.teach.cs.toronto.edu/" },
   { name: "Folio", url: "https://folio.utoronto.ca/" },
   { name: "CLNx", url: "https://clnx.utoronto.ca/" },
 ];
@@ -32,11 +32,11 @@ function SideBar() {
 
       </SideSection>
       <SideSection title="PLANNING" titleClass="planning-title">
-        <SideLink text="Calendar" to="/" />
-        <SideLink text="Deadlines" to="/" />
+        <SideLink text="Calendar" to="/dashboard" />
+        <SideLink text="Deadlines" to="/dashboard" />
       </SideSection>
       <SideSection title="WELLNESS" titleClass="wellness-title" >
-        <SideLink text="Fitness Tracker" to="/" />
+        <SideLink text="Fitness Tracker" to="/dashboard" />
       </SideSection>
     </nav>
   );

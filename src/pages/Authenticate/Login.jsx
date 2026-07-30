@@ -1,9 +1,43 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, GraduationCap, ArrowRight } from "lucide-react";
 
 function Login() {
+  const navigate = useNavigate();
+
   const [showPassword, setShowPassword] = useState(false);
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await fetch("http://localhost:3000/login", {
+        method: "POST",
+        credentials: "include", // Needed if using express-session
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        navigate("/dashboard");
+      } else {
+        alert(data.message);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Unable to connect to the server.");
+    }
+  };
 
   return (
     <div
@@ -11,7 +45,6 @@ function Login() {
       style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}
     >
       <div className="w-full max-w-md">
-
         {/* Logo / Brand */}
         <div className="flex flex-col items-center mb-8">
           <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center shadow-lg mb-4">
@@ -27,18 +60,10 @@ function Login() {
           </p>
         </div>
 
-
         {/* Card */}
         <div className="bg-card rounded-2xl shadow-sm border border-border overflow-hidden">
-
           <div className="px-8 py-8">
-
-            <form
-              action="http://localhost:3000/login"
-              method="POST"
-              className="space-y-5"
-            >
-
+            <form onSubmit={handleLogin} className="space-y-5">
               {/* Email */}
               <div>
                 <label
@@ -53,16 +78,16 @@ function Login() {
                   type="email"
                   name="email"
                   required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@mail.utoronto.ca"
                   className="block w-full rounded-xl bg-muted border border-border px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all"
                 />
               </div>
 
-
               {/* Password */}
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-
                   <label
                     htmlFor="password"
                     className="block text-sm font-medium text-card-foreground"
@@ -76,21 +101,19 @@ function Login() {
                   >
                     Forgot password?
                   </a>
-
                 </div>
 
-
                 <div className="relative">
-
                   <input
                     id="password"
                     type={showPassword ? "text" : "password"}
                     name="password"
                     required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
                     className="block w-full rounded-xl bg-muted border border-border px-4 py-2.5 pr-11 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all"
                   />
-
 
                   <button
                     type="button"
@@ -103,14 +126,11 @@ function Login() {
                       <Eye className="w-4 h-4" />
                     )}
                   </button>
-
                 </div>
               </div>
 
-
               {/* Divider */}
               <div className="h-px bg-border" />
-
 
               {/* Submit */}
               <button
@@ -120,15 +140,11 @@ function Login() {
                 Sign in
                 <ArrowRight className="w-4 h-4" />
               </button>
-
             </form>
-
           </div>
-
 
           {/* Footer */}
           <div className="px-8 py-4 bg-muted/40 border-t border-border flex items-center justify-center gap-1.5">
-
             <span className="text-sm text-muted-foreground">
               Don't have an account?
             </span>
@@ -139,17 +155,13 @@ function Login() {
             >
               Create one
             </Link>
-
           </div>
-
         </div>
-
 
         {/* Bottom caption */}
         <p className="text-center text-xs text-muted-foreground mt-6">
           University of Toronto &mdash; Student Information System
         </p>
-
       </div>
     </div>
   );

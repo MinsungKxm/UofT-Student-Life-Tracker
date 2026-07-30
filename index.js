@@ -3,8 +3,12 @@ import path from "path";
 import { fileURLToPath } from "url";
 import pg from "pg";
 import dotenv from "dotenv";
+import bcrypt from "bcrypt";
+import session from "express-session";
+import cors from "cors";
 
 dotenv.config();
+console.log(process.env.SESSION_SECRET);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -20,10 +24,27 @@ const db = new pg.Client({
 });
 
 db.connect();
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: true,
+}));
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "dist")));
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+
+    cookie: {
+      maxAge: 1000 * 60 * 60 * 24 // 1 day
+    }
+  })
+);
+
+
 
 app.post("/register", async (req, res) => {
 
@@ -42,9 +63,11 @@ app.post("/register", async (req, res) => {
       });
     }
 
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     await db.query(
       "INSERT INTO users (email, password) VALUES ($1, $2)",
-      [username, password]
+      [username, hashedPassword]
     );
 
     res.redirect("http://localhost:5173/");
@@ -69,10 +92,19 @@ app.post("/login", async (req, res) => {
     if (result.rows.length > 0) {
       const user = result.rows[0];
 
-      if (password === user.password) {
-        res.redirect("http://localhost:5173/dashboard");
+      const match = await bcrypt.compare(password, user.password);
 
-      } else {
+      if (match) {
+          req.session.user = {
+              id: user.id,
+              email: user.email
+          };
+
+          res.json({
+              success: true
+          });
+      }
+      else {
         res.status(401).json({
           message: "Incorrect password"
         });
@@ -89,6 +121,7 @@ app.post("/login", async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
+
 
 app.listen(3000, () => {
   console.log("Server running on port 3000");
