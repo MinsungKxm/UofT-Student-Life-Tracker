@@ -31,9 +31,9 @@ db.connect()
     console.log("Database connection failed:", err);
   });
 
-  
+
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: true,
   credentials: true,
 }));
 
@@ -47,7 +47,9 @@ app.use(
     saveUninitialized: false,
 
     cookie: {
-      maxAge: 1000 * 60 * 60 * 24 // 1 day
+      maxAge: 1000 * 60 * 60 * 24, // 1 day
+      secure: true,
+      sameSite: "none"
     }
   })
 );
