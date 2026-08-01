@@ -16,14 +16,9 @@ function Login() {
     try {
       const response = await fetch("http://localhost:3000/login", {
         method: "POST",
-        credentials: "include", // Needed if using express-session
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
       });
 
       const data = await response.json();

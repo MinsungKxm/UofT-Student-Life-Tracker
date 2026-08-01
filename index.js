@@ -6,6 +6,7 @@ import dotenv from "dotenv";
 import bcrypt from "bcrypt";
 import session from "express-session";
 import cors from "cors";
+import { stripTypeScriptTypes } from "module";
 
 dotenv.config();
 console.log(process.env.SESSION_SECRET);
@@ -44,6 +45,139 @@ app.use(
   })
 );
 
+// middleware
+
+function requireLogin(req, res, next) {
+  if (!req.session.user) {
+    return res.status(401).json({
+      message: "Please log in."
+    });
+  }
+
+  next();
+}
+
+// automatically checks if you're logged in when accessing the dashboard
+
+app.get("/dashboard", requireLogin, (req, res) => {
+  try{
+
+  }catch(err){
+
+  }
+});
+
+// called everytiem you try to enter the website, automatically chec ks if ur logged in
+
+app.get("/session", (req, res) => {
+
+  if (!req.session.user) {
+    return res.json({
+      loggedIn: false
+    });
+  }
+
+  res.json({
+    loggedIn: true,
+    user: req.session.user
+  });
+
+});
+
+// logout route, probably connect it to a button
+
+app.post("/logout", (req, res) => {
+
+  req.session.destroy(err => {
+
+    if (err) {
+      return res.status(500).json({
+        message: "Logout failed."
+      });
+    }
+
+    res.clearCookie("connect.sid");
+
+    res.json({
+      success: true
+    });
+
+  });
+
+});
+
+// get all events related to the user
+
+// get all events related to the user
+app.get("/events", requireLogin, async (req, res) => {
+  const userId = req.session.user.id;
+
+  try {
+    const result = await db.query(
+      `
+      SELECT *
+      FROM events
+      WHERE user_id = $1
+      ORDER BY start_time
+      `,
+      [userId]
+    );
+
+    res.json(result.rows);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// adding events to the database
+app.post("/events", requireLogin, async (req, res) => {
+  const userId = req.session.user.id;
+
+  const {
+    title,
+    description,
+    start_time,
+    end_time,
+    course,
+    is_deadline
+  } = req.body;
+
+  try {
+    await db.query(
+      `
+      INSERT INTO events
+      (user_id, title, description, start_time, end_time, course, is_deadline)
+      VALUES
+      ($1,$2,$3,$4,$5,$6,$7)
+      `,
+      [userId, title, description, start_time, end_time, course || null, !!is_deadline]
+    );
+
+    res.json({ success: true });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+app.get("/schedule/today", requireLogin, async (req,res)=>{
+
+    const userId = req.session.user.id;
+
+    const result = await db.query(
+    `
+    SELECT *
+    FROM events
+    WHERE user_id=$1
+    AND DATE(start_time)=CURRENT_DATE
+    ORDER BY start_time
+    `,
+    [userId]);
+
+    res.json(result.rows);
+
+});
 
 
 app.post("/register", async (req, res) => {
@@ -77,6 +211,7 @@ app.post("/register", async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
+
 
 
 app.post("/login", async (req, res) => {

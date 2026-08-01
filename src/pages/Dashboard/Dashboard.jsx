@@ -1,10 +1,11 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import SideLink from "../../components/SideLink";
 import SideSection from "../../components/SideSection";
 import SideBar from "../../components/SideBar";
 import Card from "../../components/Card";
 import Header from "../.././components/Header.jsx";
+import { api } from '../../api'; // adjust path to wherever you put api.js
 
 // ---- Resource links (sidebar + quick links) ----------------------------------
 const RESOURCES = [
@@ -118,19 +119,45 @@ function Dashboard() {
 
   // Checklist state
   const [checklist, setChecklist] = useState(INITIAL_CHECKLIST);
-  // Deadlines — seeded relative to "today" so the status tags are always accurate
-  const [deadlines] = useState(() => [
-    { id: 1, course: 'CSC207', title: 'Assignment 2', due: addDays(today, -2) },
-    { id: 2, course: 'MAT223', title: 'Problem Set 4', due: addDays(today, 1) },
-    { id: 3, course: 'STA257', title: 'Term Test 1', due: addDays(today, 4) },
-    { id: 4, course: 'WRIT101', title: 'Essay Draft', due: addDays(today, 9) }
-  ]);
+
+  // ---- Single source of truth: raw events from the backend -------------------
+  // Deadlines are just events with is_deadline = true, so both the calendar
+  // and the deadlines panel derive from this one array.
+  const [allEvents, setAllEvents] = useState([]);
+  const [loadingEvents, setLoadingEvents] = useState(true);
+
+  useEffect(() => {
+    api.getEvents()
+      .then((rows) => setAllEvents(rows))
+      .catch((err) => console.error("Failed to load events:", err))
+      .finally(() => setLoadingEvents(false));
+  }, []);
+
+  // Calendar view: grouped by date, keeping id + title so items can be removed
+  const events = useMemo(() => {
+    const grouped = {};
+    for (const ev of allEvents) {
+      const key = formatDateKey(new Date(ev.start_time));
+      (grouped[key] ||= []).push({ id: ev.id, title: ev.title });
+    }
+    return grouped;
+  }, [allEvents]);
+
+  // Deadlines panel: just the events flagged as deadlines
+  const deadlines = useMemo(() => {
+    return allEvents
+      .filter((ev) => ev.is_deadline)
+      .map((ev) => ({ ...ev, due: new Date(ev.start_time) }))
+      .sort((a, b) => a.due - b.due);
+  }, [allEvents]);
 
   // Calendar state
   const [calMonth, setCalMonth] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
-  const [events, setEvents] = useState({}); // { 'YYYY-MM-DD': ['event text', ...] }
+
   const [selectedDay, setSelectedDay] = useState(todayKey);
   const [newEventText, setNewEventText] = useState('');
+  const [newEventCourse, setNewEventCourse] = useState('');
+  const [newEventIsDeadline, setNewEventIsDeadline] = useState(false);
 
   // Fitness state
   const [workouts, setWorkouts] = useState([]); // [{ id, type, duration, date }]
@@ -151,25 +178,44 @@ function Dashboard() {
     setCalMonth(new Date(dateObj.getFullYear(), dateObj.getMonth(), 1)); 
   }
 
-  function handleAddEvent(e) {
+  async function handleAddEvent(e) {
     e.preventDefault();
+    console.log("Adding event...");
+
     if (!newEventText.trim()) return;
-    setEvents((prev) => {
-      const existing = prev[selectedDay] || [];
-      return { ...prev, [selectedDay]: [...existing, newEventText.trim()] };
-    });
-    setNewEventText('');
+
+    const [y, m, d] = selectedDay.split('-').map(Number);
+    const start = new Date(y, m - 1, d, 9, 0); // default 9am — adjust as needed
+    const end = new Date(y, m - 1, d, 10, 0);
+
+    try {
+      await api.addEvent({
+        title: newEventText.trim(),
+        description: "",
+        start_time: start.toISOString(),
+        end_time: end.toISOString(),
+        course: newEventCourse.trim() || null,
+        is_deadline: newEventIsDeadline,
+      });
+
+      // Refetch so the calendar and deadlines panel both stay in sync,
+      // since they're both derived from allEvents.
+      const rows = await api.getEvents();
+      setAllEvents(rows);
+
+      setNewEventText('');
+      setNewEventCourse('');
+      setNewEventIsDeadline(false);
+    } catch (err) {
+      console.error("Failed to add event:", err);
+    }
   }
 
-  function handleRemoveEvent(idx) {
-    setEvents((prev) => {
-      const list = [...(prev[selectedDay] || [])];
-      list.splice(idx, 1);
-      const next = { ...prev };
-      if (list.length) next[selectedDay] = list;
-      else delete next[selectedDay];
-      return next;
-    });
+  function handleRemoveEvent(id) {
+    // NOTE: this only removes the event locally. To persist the removal
+    // you'll need a DELETE /events/:id route on the backend and an
+    // api.deleteEvent(id) call here instead.
+    setAllEvents((prev) => prev.filter((ev) => ev.id !== id));
   }
 
   function toggleChecklistItem(id) {
@@ -254,8 +300,8 @@ function Dashboard() {
                 <>
                   <h3 className="panel-heading subheading">From your calendar</h3>
                   <ul className="plain-list">
-                    {todaysEvents.map((ev, i) => (
-                      <li key={i}>{ev}</li>
+                    {todaysEvents.map((ev) => (
+                      <li key={ev.id}>{ev.title}</li>
                     ))}
                   </ul>
                 </>
@@ -340,25 +386,31 @@ function Dashboard() {
                 </a>
               }
             >
-              <ul className="deadline-list">
-                {deadlines.map((d) => {
-                  const status = getDeadlineStatus(d.due, today);
-                  return (
-                    <li key={d.id} className="deadline-row">
-                      <div className="deadline-info">
-                        <span className="deadline-course">{d.course}</span>
-                        <span className="deadline-title">{d.title}</span>
-                      </div>
-                      <div className="deadline-meta">
-                        <span className="deadline-date">
-                          {d.due.toLocaleDateString("en-CA", { month: "short", day: "numeric" })}
-                        </span>
-                        <span className={`status-tag status-tag-${status.tone}`}>{status.label}</span>
-                      </div>
-                    </li>
-                  );
-                })}
-              </ul>
+              {loadingEvents ? (
+                <p className="muted-text">Loading deadlines…</p>
+              ) : deadlines.length === 0 ? (
+                <p className="muted-text">No deadlines tracked yet.</p>
+              ) : (
+                <ul className="deadline-list">
+                  {deadlines.map((d) => {
+                    const status = getDeadlineStatus(d.due, today);
+                    return (
+                      <li key={d.id} className="deadline-row">
+                        <div className="deadline-info">
+                          <span className="deadline-course">{d.course}</span>
+                          <span className="deadline-title">{d.title}</span>
+                        </div>
+                        <div className="deadline-meta">
+                          <span className="deadline-date">
+                            {d.due.toLocaleDateString("en-CA", { month: "short", day: "numeric" })}
+                          </span>
+                          <span className={`status-tag status-tag-${status.tone}`}>{status.label}</span>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
             </Card>
             {/* Calendar */}
             <section className="card card-wide" id="calendar">
@@ -415,13 +467,13 @@ function Dashboard() {
                     <p className="muted-text">No events for this day.</p>
                   ) : (
                     <ul className="event-list">
-                      {(events[selectedDay] || []).map((ev, i) => (
-                        <li key={i}>
-                          <span>{ev}</span>
+                      {(events[selectedDay] || []).map((ev) => (
+                        <li key={ev.id}>
+                          <span>{ev.title}</span>
                           <button
                             type="button"
                             className="remove-btn"
-                            onClick={() => handleRemoveEvent(i)}
+                            onClick={() => handleRemoveEvent(ev.id)}
                             aria-label="Remove event"
                           >
                             ×
@@ -437,6 +489,20 @@ function Dashboard() {
                       value={newEventText}
                       onChange={(e) => setNewEventText(e.target.value)}
                     />
+                    <input
+                      type="text"
+                      placeholder="Course (optional)"
+                      value={newEventCourse}
+                      onChange={(e) => setNewEventCourse(e.target.value)}
+                    />
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}>
+                      <input
+                        type="checkbox"
+                        checked={newEventIsDeadline}
+                        onChange={(e) => setNewEventIsDeadline(e.target.checked)}
+                      />
+                      This is a deadline
+                    </label>
                     <button type="submit" className="btn btn-primary btn-sm">Add</button>
                   </form>
                 </div>
