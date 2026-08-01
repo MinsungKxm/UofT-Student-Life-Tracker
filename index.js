@@ -213,7 +213,7 @@ app.post("/register", async (req, res) => {
       [username, hashedPassword]
     );
 
-    res.redirect("http://localhost:5173/");
+    res.redirect("/");
 
   } catch (err) {
     console.log(err);
@@ -265,9 +265,10 @@ app.post("/login", async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
+const PORT = process.env.PORT || 3000;
 
-
-app.listen(3000, () => {
-  console.log("Server running on port 3000");
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
+
 
