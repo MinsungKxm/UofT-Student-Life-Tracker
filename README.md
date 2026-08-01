@@ -75,8 +75,6 @@ Centralized guides covering:
 
 ---
 
-## Tech Stack
-
 ### Frontend
 
 * React
@@ -160,22 +158,6 @@ npm start
 ```
 
 The application will then be available locally.
-
----
-
-## Future Improvements
-
-Planned features include:
-
-* Event editing and deletion with database persistence
-* Weekly and monthly calendar views
-* Email reminders for deadlines
-* Google Calendar integration
-* AI-powered study planner
-* Mobile-responsive improvements
-* Dark mode
-* Password reset functionality
-* OAuth login (Google / UofT)
 
 ---
 
