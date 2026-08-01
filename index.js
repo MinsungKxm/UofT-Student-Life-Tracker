@@ -17,14 +17,21 @@ const __dirname = path.dirname(__filename);
 const app = express();
 
 const db = new pg.Client({
-  user: process.env.USER,
-  host: "localhost",
-  database: process.env.DATABASE,
-  password: process.env.PASSWORD,
-  port: 5432,
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false
+  }
 });
 
-db.connect();
+db.connect()
+  .then(() => {
+    console.log("Connected to Neon PostgreSQL");
+  })
+  .catch((err) => {
+    console.log("Database connection failed:", err);
+  });
+
+  
 app.use(cors({
   origin: "http://localhost:5173",
   credentials: true,

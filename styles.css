@@ -846,12 +846,14 @@ button {
 }
 
 .add-event-form {
-  display: flex;
-  gap: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 1rem;
 }
 
 .add-event-form input {
-  flex: 1;
+  width: 100%;
   border: 1px solid var(--border-light);
   border-radius: 4px;
   padding: 8px 10px;
@@ -861,6 +863,19 @@ button {
 .add-event-form input:focus {
   outline: 2px solid var(--blue-accent);
   outline-offset: 1px;
+}
+
+.add-event-form label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    align-self: flex-start;
+    margin: 0;
+}
+.add-event-form input[type="checkbox"] {
+    margin: 0;
+    width: auto;
+    flex: none;
 }
 
 /* ---------------------------- Fitness tracker ------------------------------ */
