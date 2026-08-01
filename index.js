@@ -16,6 +16,8 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
+app.set("trust proxy", 1);
+
 const db = new pg.Client({
   connectionString: process.env.DATABASE_URL,
   ssl: {
