@@ -2,6 +2,8 @@
 
 A student-focused productivity and resource management web application designed to help University of Toronto students organize their academic life, discover campus resources, and stay on top of important deadlines.
 
+The website can be accessed via this link: https://uoft-student-life-tracker.onrender.com/ 
+
 ## Overview
 
 University students often have to navigate many disconnected platforms for courses, deadlines, campus services, and opportunities. The UofT Student Life Tracker brings these resources together into one centralized dashboard.
