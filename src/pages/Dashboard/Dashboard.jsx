@@ -211,11 +211,17 @@ function Dashboard() {
     }
   }
 
-  function handleRemoveEvent(id) {
-    // NOTE: this only removes the event locally. To persist the removal
-    // you'll need a DELETE /events/:id route on the backend and an
-    // api.deleteEvent(id) call here instead.
-    setAllEvents((prev) => prev.filter((ev) => ev.id !== id));
+  async function handleRemoveEvent(id) {
+    try {
+      await api.deleteEvent(id);
+
+      setAllEvents((prev) =>
+        prev.filter((ev) => ev.id !== id)
+      );
+
+    } catch (err) {
+      console.error("Failed to delete event:", err);
+    }
   }
 
   function toggleChecklistItem(id) {

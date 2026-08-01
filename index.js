@@ -172,6 +172,28 @@ app.post("/events", requireLogin, async (req, res) => {
   }
 });
 
+app.delete("/events/:id", requireLogin, async (req, res) => {
+  const userId = req.session.user.id;
+  const eventId = req.params.id;
+
+  try {
+    await db.query(
+      `
+      DELETE FROM events
+      WHERE id = $1
+      AND user_id = $2
+      `,
+      [eventId, userId]
+    );
+
+    res.json({ success: true });
+
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 app.get("/schedule/today", requireLogin, async (req,res)=>{
 
     const userId = req.session.user.id;

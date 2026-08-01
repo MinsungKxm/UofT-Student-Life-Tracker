@@ -43,6 +43,10 @@ export const api = {
       method: "POST",
       body: JSON.stringify(event),
     }),
+  deleteEvent: (id) =>
+    request(`/events/${id}`, {
+      method: "DELETE",
+    }),
 
   getDeadlines: () => request("/deadlines"),
 
