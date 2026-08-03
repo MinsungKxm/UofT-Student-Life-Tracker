@@ -154,15 +154,18 @@ app.post("/events", requireLogin, async (req, res) => {
     is_deadline
   } = req.body;
 
+  // derive event_date from start_time (YYYY-MM-DD)
+  const event_date = start_time ? start_time.slice(0, 10) : null;
+
   try {
     await db.query(
       `
       INSERT INTO events
-      (user_id, title, description, start_time, end_time, course, is_deadline)
+      (user_id, title, description, start_time, end_time, course, is_deadline, event_date, completed)
       VALUES
-      ($1,$2,$3,$4,$5,$6,$7)
+      ($1,$2,$3,$4,$5,$6,$7,$8,$9)
       `,
-      [userId, title, description, start_time, end_time, course || null, !!is_deadline]
+      [userId, title, description, start_time, end_time, course || null, !!is_deadline, event_date, false]
     );
 
     res.json({ success: true });
