@@ -151,7 +151,6 @@ app.get("/tasks", requireLogin, async (req, res) => {
       FROM events
       WHERE user_id = $1
         AND is_deadline = true
-        AND completed = false
       ORDER BY event_date
       LIMIT 5
       `,

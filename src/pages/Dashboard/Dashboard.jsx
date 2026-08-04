@@ -306,16 +306,24 @@ function Dashboard() {
     }
   }
 /*
-  function toggleChecklistItem(id) {
-    setChecklist((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, done: !item.done } : item))
-    );
-  }*/
  async function completeTask(id){
 
     await api.completeTask(id);
 
     setChecklist(await api.getTasks());
+
+}*/
+async function completeTask(id) {
+
+    await api.completeTask(id);
+
+    setChecklist((prev) =>
+        prev.map((task) =>
+            task.id === id
+                ? { ...task, completed: true }
+                : task
+        )
+    );
 
 }
 
