@@ -32,6 +32,7 @@ const TODAY_CLASSES = [
   { id: 3, course: 'STA257', title: 'Probability Lecture', time: '3:00 PM', location: 'MP 134' },
 ];
 
+/*
 const INITIAL_CHECKLIST = [
   { id: 1, text: 'Verify your contact information on ACORN', done: true },
   { id: 2, text: 'Enrol in Fall/Winter courses', done: false },
@@ -39,6 +40,7 @@ const INITIAL_CHECKLIST = [
   { id: 4, text: 'Set up two-factor authentication for UTORid', done: true },
   { id: 5, text: 'Order your TCard', done: false },
 ];
+*/
 
 // ---- Helpers --------------------------------------------------------------------
 
@@ -106,7 +108,38 @@ function getDeadlineStatus(due, today) {
   return { label: 'Upcoming', tone: 'green' };
 }
 
+async function handleAddTask(e){
 
+    e.preventDefault();
+
+    if(!newTask.trim()) return;
+
+    const now = new Date();
+
+    await api.addEvent({
+
+        title:newTask,
+        description:"",
+        start_time:now.toISOString(),
+        end_time:now.toISOString(),
+        course:null,
+        is_deadline:true
+
+    });
+
+    setNewTask("");
+
+    setChecklist(await api.getTasks());
+
+}
+
+async function removeTask(id){
+
+    await api.deleteTask(id);
+
+    setChecklist(await api.getTasks());
+
+}
 
 function Dashboard() {
   // Stable "today" reference so derived values (deadlines, weekly totals) stay
@@ -118,20 +151,44 @@ function Dashboard() {
   const [activeLink, setActiveLink] = useState('dashboard');
 
   // Checklist state
+  /*
   const [checklist, setChecklist] = useState(INITIAL_CHECKLIST);
-
+*/
+  const [checklist, setChecklist] = useState([]);
+  const [newTask, setNewTask] = useState("");
   // ---- Single source of truth: raw events from the backend -------------------
   // Deadlines are just events with is_deadline = true, so both the calendar
   // and the deadlines panel derive from this one array.
   const [allEvents, setAllEvents] = useState([]);
   const [loadingEvents, setLoadingEvents] = useState(true);
 
+  /*
   useEffect(() => {
     api.getEvents()
       .then((rows) => setAllEvents(rows))
       .catch((err) => console.error("Failed to load events:", err))
       .finally(() => setLoadingEvents(false));
   }, []);
+
+  */
+  useEffect(() => {
+
+    async function load(){
+
+        const [events, tasks] = await Promise.all([
+            api.getEvents(),
+            api.getTasks()
+        ]);
+
+        setAllEvents(events);
+        setChecklist(tasks);
+        setLoadingEvents(false);
+
+    }
+
+    load().catch(console.error);
+
+},[]);
 
   // Calendar view: grouped by date, keeping id + title so items can be removed
   const events = useMemo(() => {
@@ -176,6 +233,31 @@ function Dashboard() {
   function handleSelectDay(dateObj) {
     setSelectedDay(formatDateKey(dateObj));
     setCalMonth(new Date(dateObj.getFullYear(), dateObj.getMonth(), 1)); 
+  }
+
+  async function handleAddTask(e){
+
+      e.preventDefault();
+
+      if(!newTask.trim()) return;
+
+      const now = new Date();
+
+      await api.addEvent({
+
+          title:newTask,
+          description:"",
+          start_time:now.toISOString(),
+          end_time:now.toISOString(),
+          course:null,
+          is_deadline:true
+
+      });
+
+      setNewTask("");
+
+      setChecklist(await api.getTasks());
+
   }
 
   async function handleAddEvent(e) {
@@ -223,12 +305,19 @@ function Dashboard() {
       console.error("Failed to delete event:", err);
     }
   }
-
+/*
   function toggleChecklistItem(id) {
     setChecklist((prev) =>
       prev.map((item) => (item.id === id ? { ...item, done: !item.done } : item))
     );
-  }
+  }*/
+ async function completeTask(id){
+
+    await api.completeTask(id);
+
+    setChecklist(await api.getTasks());
+
+}
 
   function handleAddWorkout(e) {
     e.preventDefault();
@@ -247,7 +336,7 @@ function Dashboard() {
       .reduce((sum, w) => sum + w.duration, 0);
   }, [workouts, today]);
 
-  const completedCount = checklist.filter((c) => c.done).length;
+  // const completedCount = checklist.filter((c) => c.done).length;
 
   // Attach "Now" / "Next" status tags to today's class schedule
   const nowMinutes = today.getHours() * 60 + today.getMinutes();
@@ -321,6 +410,7 @@ function Dashboard() {
             </section>
 
             {/* Task checklist */}
+            {/*
             <Card
               icon="✓"
               title="Task Checklist"
@@ -353,7 +443,50 @@ function Dashboard() {
                 ))}
               </ul>
             </Card>
+                */}
+            <Card
+              icon="✓"
+              title="Task Checklist"
+              footer="Click ✓ to complete or × to remove a task"
+            >
+              <ul className="checklist">
+                {checklist.map((item) => (
+                  <li key={item.id} className="checklist-item">
+                    <button
+                      type="button"
+                      className="checklist-toggle"
+                      onClick={() => completeTask(item.id)}
+                      aria-label="Mark task complete"
+                    >
+                      ✓
+                    </button>
 
+                    <span>{item.title}</span>
+
+                    <button
+                      type="button"
+                      className="remove-btn"
+                      onClick={() => removeTask(item.id)}
+                      aria-label="Remove task"
+                    >
+                      ×
+                    </button>
+                  </li>
+                ))}
+              </ul>
+
+              <form className="add-task-form" onSubmit={handleAddTask}>
+                <input
+                  type="text"
+                  placeholder="Add a new task..."
+                  value={newTask}
+                  onChange={(e) => setNewTask(e.target.value)}
+                />
+                <button type="submit" className="btn btn-primary btn-sm">
+                  Add
+                </button>
+              </form>
+            </Card>
             {/* Quick links */}
             <Card title="Quick Links">
               <div className="quicklinks-grid">

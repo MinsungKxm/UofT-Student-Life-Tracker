@@ -38,6 +38,19 @@ export const api = {
 
   getEvents: () => request("/events"),
 
+  getTasks: () =>
+    request("/tasks"),
+
+  completeTask: (id) =>
+    request(`/tasks/${id}/complete`, {
+        method: "PATCH"
+    }),
+
+  deleteTask: (id) =>
+    request(`/tasks/${id}`, {
+        method: "DELETE"
+    }),
+
   addEvent: (event) =>
     request("/events", {
       method: "POST",

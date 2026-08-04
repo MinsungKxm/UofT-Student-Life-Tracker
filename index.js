@@ -141,6 +141,82 @@ app.get("/events", requireLogin, async (req, res) => {
   }
 });
 
+app.get("/tasks", requireLogin, async (req, res) => {
+  const userId = req.session.user.id;
+
+  try {
+    const result = await db.query(
+      `
+      SELECT *
+      FROM events
+      WHERE user_id = $1
+        AND is_deadline = true
+        AND completed = false
+      ORDER BY event_date
+      LIMIT 5
+      `,
+      [userId]
+    );
+
+    res.json(result.rows);
+
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+app.patch("/tasks/:id/complete", requireLogin, async (req, res) => {
+  const userId = req.session.user.id;
+  const id = req.params.id;
+
+  try {
+
+    await db.query(
+      `
+      UPDATE events
+      SET completed = true
+      WHERE id = $1
+      AND user_id = $2
+      `,
+      [id, userId]
+    );
+
+    res.json({ success: true });
+
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+app.delete("/tasks/:id", requireLogin, async (req, res) => {
+
+    const userId = req.session.user.id;
+    const id = req.params.id;
+
+    try{
+
+        await db.query(
+            `
+            DELETE FROM events
+            WHERE id=$1
+            AND user_id=$2
+            `,
+            [id,userId]
+        );
+
+        res.json({success:true});
+
+    }catch(err){
+
+        console.log(err);
+        res.status(500).json({message:"Server error"});
+
+    }
+
+});
+
 // adding events to the database
 app.post("/events", requireLogin, async (req, res) => {
   const userId = req.session.user.id;
@@ -155,6 +231,7 @@ app.post("/events", requireLogin, async (req, res) => {
   } = req.body;
 
   // derive event_date from start_time (YYYY-MM-DD)
+
   const event_date = start_time ? start_time.slice(0, 10) : null;
 
   try {
