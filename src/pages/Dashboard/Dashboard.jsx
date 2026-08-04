@@ -133,14 +133,6 @@ async function handleAddTask(e){
 
 }
 
-async function removeTask(id){
-
-    await api.deleteTask(id);
-
-    setChecklist(await api.getTasks());
-
-}
-
 function Dashboard() {
   // Stable "today" reference so derived values (deadlines, weekly totals) stay
   // consistent for the life of the session instead of drifting every render.
@@ -233,6 +225,13 @@ function Dashboard() {
   function handleSelectDay(dateObj) {
     setSelectedDay(formatDateKey(dateObj));
     setCalMonth(new Date(dateObj.getFullYear(), dateObj.getMonth(), 1)); 
+  }
+    async function removeTask(id){
+
+      await api.deleteTask(id);
+
+      setChecklist(await api.getTasks());
+
   }
 
   async function handleAddTask(e){
