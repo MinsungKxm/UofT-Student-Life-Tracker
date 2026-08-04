@@ -305,13 +305,6 @@ function Dashboard() {
     }
   }
 /*
- async function completeTask(id){
-
-    await api.completeTask(id);
-
-    setChecklist(await api.getTasks());
-
-}*/
 async function completeTask(id) {
 
     await api.completeTask(id);
@@ -324,6 +317,23 @@ async function completeTask(id) {
         )
     );
 
+}
+*/
+async function completeTask(id) {
+
+    const task = checklist.find((item) => item.id === id);
+
+    const newStatus = !task.completed;
+
+    await api.completeTask(id, newStatus);
+
+    setChecklist((prev) =>
+        prev.map((item) =>
+            item.id === id
+                ? { ...item, completed: newStatus }
+                : item
+        )
+    );
 }
 
   function handleAddWorkout(e) {
