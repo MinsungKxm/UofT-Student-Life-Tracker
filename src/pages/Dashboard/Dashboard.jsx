@@ -458,7 +458,9 @@ async function completeTask(id) {
             >
               <ul className="checklist">
                 {checklist.map((item) => (
-                  <li key={item.id} className="checklist-item">
+                  <li   key={item.id}
+  className={`checklist-item ${item.completed ? "done" : ""}`}>
+                    {/*
                     <button
                       type="button"
                       className="checklist-toggle"
@@ -466,6 +468,15 @@ async function completeTask(id) {
                       aria-label="Mark task complete"
                     >
                       ✓
+                    </button>
+                    */}
+                    <button
+                      type="button"
+                      className={`checklist-toggle ${item.completed ? "completed" : ""}`}
+                      onClick={() => completeTask(item.id)}
+                      aria-label="Mark task complete"
+                    >
+                      {item.completed ? "✓" : ""}
                     </button>
 
                     <span>{item.title}</span>
