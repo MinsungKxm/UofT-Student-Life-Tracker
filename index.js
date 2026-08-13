@@ -6,15 +6,13 @@ import dotenv from "dotenv";
 import bcrypt from "bcrypt";
 import session from "express-session";
 import cors from "cors";
-import { Resend } from "resend";
-import crypto from "crypto";
+import { stripTypeScriptTypes } from "module";
 
 dotenv.config();
 console.log(process.env.SESSION_SECRET);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const resend = new Resend(process.env.RESEND_API_KEY);
 
 const app = express();
 
@@ -300,11 +298,6 @@ app.post("/register", async (req, res) => {
   const password = req.body.password;
 
   try {
-    if(!username.includes("@")){
-    return res.status(400).json({
-        message:"Invalid email"
-    });
-}
     const record = await db.query(
       "SELECT * FROM users WHERE email = $1",
       [username]
@@ -318,84 +311,19 @@ app.post("/register", async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const verificationCode =
-        crypto.randomInt(100000,999999).toString();
-
-    const expires =
-        new Date(Date.now() + 10 * 60 * 1000);
-
-    await db.query(`INSERT INTO users (email,password,email_verified,verification_code,verification_expires)
-    VALUES($1,$2,false,$3,$4)
-    `,
-    [username, hashedPassword, verificationCode, expires]
+    await db.query(
+      "INSERT INTO users (email, password) VALUES ($1, $2)",
+      [username, hashedPassword]
     );
 
-    await resend.emails.send({
+    res.redirect("/");
 
-        from: "Student Life Tracker <noreply@yourdomain.com>",
-        to: username,
-        subject: "Verify your email",
-        html: `
-        <h2>Student Life Tracker</h2>
-        <p>Your verification code is</p>
-        <h1>${verificationCode}</h1>
-        <p>Expires in 10 minutes.</p>`
-    });
-    res.json({
-      success:true
-    });
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: "Server error" });
   }
 });
 
-// email verification information
-app.post("/verify-email", async (req,res)=>{
-  try{
-    const {email, code} = req.body;
-    const result = await db.query(
-        `SELECT *
-        FROM users
-        WHERE email=$1`,
-        [email]
-    );
-    if(result.rows.length===0){
-        return res.status(404).json({
-            message:"User not found"
-        });
-    }
-    const user = result.rows[0];
-    if(user.verification_code !== code){
-        return res.status(401).json({
-            message:"Incorrect code"
-        });
-    }
-    if(new Date() > user.verification_expires){
-        return res.status(401).json({
-            message:"Code expired"
-        });
-    }
-    await db.query(
-        `UPDATE users
-        SET
-        email_verified=true,
-        verification_code=NULL,
-        verification_expires=NULL
-        WHERE id=$1
-        `,
-        [user.id]
-    );
-    res.json({
-        success:true
-    });
-  }catch(err){
-    console.log(err);
-    res.status(500).json({
-        message:"Server error"
-    });
-  }
-});
 
 
 app.post("/login", async (req, res) => {
@@ -410,25 +338,25 @@ app.post("/login", async (req, res) => {
 
     if (result.rows.length > 0) {
       const user = result.rows[0];
+
       const match = await bcrypt.compare(password, user.password);
 
-      if (!match) {
-          return res.status(401).json({
-              message:"Incorrect password"
+      if (match) {
+          req.session.user = {
+              id: user.id,
+              email: user.email
+          };
+
+          res.json({
+              success: true
           });
       }
-      if (!user.email_verified) {
-          return res.status(403).json({
-              message:"Please verify your email first."
-          });
+      else {
+        res.status(401).json({
+          message: "Incorrect password"
+        });
       }
-      req.session.user = {
-          id:user.id,
-          email:user.email
-      };
-      res.json({
-          success:true
-      });
+
     } else {
       res.status(404).json({
         message: "User not found"
@@ -445,5 +373,4 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-
 
