@@ -14,7 +14,8 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+
+        <Route path="/" element={<Navigate to="/login" replace />} />
 
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
@@ -27,6 +28,7 @@ function App() {
           <Route path="/guides/rop" element={<ROP />} />
           <Route path="/guides/work-study" element={<WorkStudy />} />
         </Route>
+
       </Routes>
     </BrowserRouter>
   );
